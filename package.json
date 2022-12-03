@@ -7,11 +7,14 @@
     "start": "node ./bin/www.cjs"
   },
   "dependencies": {
+    "@anggamanggala21/text-to-speech": "^0.1.2",
+    "canvas": "^2.10.2",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "express-fileupload": "^1.4.0",
     "morgan": "~1.9.1",
+    "pdf2pic": "^2.1.4",
     "pdfjs-dist": "^3.1.81",
     "tesseract.js": "^4.0.0"
   }

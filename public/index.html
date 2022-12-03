@@ -1,22 +1,53 @@
 <html>
 
 <head>
-  <title>Express</title>
+  <meta charset="UTF-8">
+  <meta name="author" content="Duy, Jared, Roberto, Zach">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
   <link rel="stylesheet" href="/stylesheets/style.css">
+  <title>Express</title>
 </head>
 
 <body>
-  <h1>Express</h1>
-  <p>Welcome to Express</p>
-  <form method="POST" action="api/v1/scan"  enctype="multipart/form-data">
-    <div>
-      <label for="pdf">Upload PDF you wish to convert to audio:</label>
-      <input type="file" name="pdf" accept="application/pdf"/>
-    </div>
-    <input type="submit">
-  </form>
-  <!-- <iframe name="hiddenFrame" width="0" height="0" border="0" style="display: none;"></iframe> -->
+  <header>
+    <h1>Image to Text and Audio</h1>
+  </header>
+  <main>
+    <p></p>
+    <form method="POST" action="api/v1/scan"  enctype="multipart/form-data">
+      <div class="container">
+        <div class="button-wrap">
+          <label for="pdf">Upload PDF you wish to convert to audio:</label>
+          <input type="file" name="pdf" accept="application/pdf"/>
+        </div>
+        <input type="submit">
+      </div>
+    </form>
 
+
+    <div class="container-fluid center">
+      <div class="container">
+        <div class="row row-padding">
+          <div class="card-container col d-flex col-md-5 col-12 m-2">
+            <div>
+              <div class="card-body btn btn-dark download-button">
+                <p class="card-text">Download Text File</p>
+              </div>
+            </div>
+          </div>
+          <div class="card-container col d-flex col-md-5 col-12 m-2">
+            <div>
+              <div class="card-body btn btn-dark download-button">
+                <p class="card-text">Play Audio</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
   </form>
 </body>
 
