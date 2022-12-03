@@ -8,6 +8,16 @@
 <body>
   <h1>Express</h1>
   <p>Welcome to Express</p>
+  <form method="POST" action="api/v1/scan"  enctype="multipart/form-data">
+    <div>
+      <label for="pdf">Upload PDF you wish to convert to audio:</label>
+      <input type="file" name="pdf" accept="application/pdf"/>
+    </div>
+    <input type="submit">
+  </form>
+  <!-- <iframe name="hiddenFrame" width="0" height="0" border="0" style="display: none;"></iframe> -->
+
+  </form>
 </body>
 
 </html>
