@@ -3,7 +3,7 @@ import Tesseract from 'tesseract.js';
 import { createWorker } from 'tesseract.js';
 
 import { writeFile, readFile, unlink } from 'fs/promises';
-
+import { PDFDocument } from 'pdf-lib'
 import pdfjs from 'pdfjs-dist/legacy/build/pdf.js';
 import {fromBuffer} from 'pdf2pic';
 
@@ -23,28 +23,22 @@ router.get('/', (req, res)=>{
 
 router.post('/', async (req, res) => {
     const { pdf } = req.files;
-    pdf.mv(`./pdf/${pdf.name}`);
-    let pages = 0;
+    const split_pdf = await newPdfBytes(await PDFDocument.load(pdf.data))
+    // pdf.mv(`./pdf/${pdf.name}`);
     const png = []
-    try {
-        const pdfDoc = await pdfjs.getDocument(pdf.data).promise;
-        pages = pdfDoc.numPages;
-    } catch (error) {
-        console.log(error);
-    }
     
     const options = {
         quality: 100,
-        density: 150,
+        density: 200,
         saveFilename: "test2",
         savePath: "./images",
         format: "png",
         compression: "None",
-        width: 3000,
-        height: 2000
+        width: split_pdf[2]*3,
+        height: split_pdf[3]*3
     };
     
-    const image = fromBuffer(pdf.data, options)
+    const image = fromBuffer(split_pdf[0], options)
     const worker = await createWorker({
         logger: m => console.log(m)
     });
@@ -52,7 +46,7 @@ router.post('/', async (req, res) => {
     await worker.loadLanguage('eng');
     await worker.initialize('eng');
     // await worker.recognize(image);
-    for (let i = 1; i <= pages; i++) {
+    for (let i = 1; i <= split_pdf[1]; i++) {
         let p1 = await image(i)
         png.push(p1.path)
         const { data: { text } } = await worker.recognize(await readFile(p1.path));
@@ -71,6 +65,64 @@ router.post('/', async (req, res) => {
     res.json({"status":"success"})
 
 });
+
+// code modfied from https://shreevatsa.net/pdf-unspread/#
+async function newPdfBytes(pdfDoc) {
+    const pages = pdfDoc.getPages();
+    const n = pages.length;
+
+    // Split PDF
+    const newDoc = await PDFDocument.create();
+    const doubled = [];
+    for (let i = 0; i < n; ++i) {
+      doubled.push(i);
+      doubled.push(i);
+    }
+    const newPages = await newDoc.copyPages(pdfDoc, doubled);
+    for (let i = 0; i < n; ++i) {
+      let { x, y, width, height } = pages[i].getMediaBox();
+      const rotation = pages[i].getRotation().angle;
+      // I've only tested the "rotation = 0" and "rotation = 270 but not 2-up" cases. There are likely bugs, e.g. setting the rotation of the new pages.
+      if (rotation == 0 && width > height) {
+        console.log(`Page ${i}: ${x} ${y} ${width} ${height} and rotation: ${rotation}, splitting`);
+        const ww = width / 2.0;
+        newPages[2 * i].setMediaBox(x, y, ww, height);
+        newPages[2 * i + 1].setMediaBox(x + ww, y, ww, height);
+        newDoc.addPage(newPages[2 * i]);
+        newDoc.addPage(newPages[2 * i + 1]);
+      } else if (rotation == 90 && height > width) {
+        console.log(`Page ${i}: ${x} ${y} ${width} ${height} and rotation: ${rotation}, splitting`);
+        const ww = height / 2.0;
+        newPages[2 * i].setMediaBox(x, y, width, ww);
+        newPages[2 * i + 1].setMediaBox(x, y + ww, width, ww);
+        newDoc.addPage(newPages[2 * i]);
+        newDoc.addPage(newPages[2 * i + 1]);
+      } else if (rotation == 180 && width > height) {
+        console.log(`Page ${i}: ${x} ${y} ${width} ${height} and rotation: ${rotation}, splitting`);
+        const ww = width / 2.0;
+        newPages[2 * i].setMediaBox(x + ww, y, ww, height);
+        newPages[2 * i + 1].setMediaBox(x, y, ww, height);
+        newDoc.addPage(newPages[2 * i]);
+        newDoc.addPage(newPages[2 * i + 1]);
+      } else if (rotation == 270 && height > width) {
+        console.log(`Page ${i}: ${x} ${y} ${width} ${height} and rotation: ${rotation}, splitting`);
+        const ww = height / 2.0;
+        newPages[2 * i].setMediaBox(x, y + ww, width, ww);
+        newPages[2 * i + 1].setMediaBox(x, y, width, ww);
+        newDoc.addPage(newPages[2 * i]);
+        newDoc.addPage(newPages[2 * i + 1]);
+      } else {
+        console.log(`Page ${i}: ${x} ${y} ${width} ${height} and rotation: ${rotation}, not splitting`);
+        newDoc.addPage(newPages[2 * i]);
+      }
+    }
+    let { x, y, width, height } = newDoc.getPages()[0].getMediaBox();
+    const newBytes = await newDoc.save();
+    const numPages = newDoc.getPageCount();
+    console.log(`Returning ${newBytes.byteLength} bytes and page count: ${numPages}`);
+    return [newBytes, numPages, width, height];
+  }
+
 
 
 export default router;
