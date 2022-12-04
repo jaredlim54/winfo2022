@@ -8,7 +8,7 @@
 body {
   padding: 0;
   margin: 0;
-  font: 1.5rem "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 2em "Nunito Sans", "Raleway", "Lucida Grande", Helvetica, Arial, sans-serif;
   color: #333f58;
   background-color: #fbbbad;
 }
@@ -19,13 +19,13 @@ main{
 
 header{
   background-color: #333f58;
-  padding: 1rem 0;
+  padding: 1em 0;
   color: #ee8695;
 }
 
 h1{
 
-  font: 5rem Helvetica;
+  font: 2em "Raleway";
   text-align: center;
   margin: 0;
 }
@@ -61,10 +61,7 @@ input[type="file"] {
   top: 2em;
   left: .5em;
   font-size: .7em;
-}
-
-input[type="submit"]{
-
+  color: black;
 }
 
 .button-wrap {

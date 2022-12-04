@@ -4,26 +4,151 @@
   <meta charset="UTF-8">
   <meta name="author" content="Duy, Jared, Roberto, Zach">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300&family=Raleway:ital,wght@1,200&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
   <link rel="stylesheet" href="/stylesheets/style.css">
+  <script src="/javascripts/index.js"></script>
+  <script src="/javascripts/identity.js"></script>
+  <script src="/javascripts/utils.js"></script>
+  <script src="/javascripts/api_version.js"></script>
   <title>Express</title>
 </head>
 
-<body>
+<script>
+  let myIdentity = undefined;
+  const client = new textToSpeech.TextToSpeechClient();
+
+  let textExample = "Our inventions change the world, and the reinvented world changes us. Human life on Earth today looks radically different from just a century ago, thanks in good part to technologies invented in the intervening years. Once firmly earthbound, with only legs and wheels to carry us on land and ships to cross the waters, we have now taken to flight in droves, with more than eight million passengers criss-crossing continents each day in a few airborne hours. If Rich-ard Branson, found of Virgin Galactic, achieves his dream of building the world's first commercial ordinary people may soon become astronauts. Communication, too, has broken free from shackles of time and distance. When I left India in the mid-1950s, it took three weeks for letters to go back and forth from Kolkata, where I was born, to Scarsdale, New York, where my family first settled. Mail would not arrive reliably. Stamps would be stolen and packages not delivered. Today, an electronic message sent at night from the eastern United States brings an instant reply from a friend in Europe or Asia whose day is just beginning. Facebook connects more than a billion users worldwide with a single mouse click or two. Last but not least, we have cracked the secrets of living";
+
+  function playAudio() {
+      // The text to synthesize
+      var msg = new SpeechSynthesisUtterance();
+      //msg.text = "Our inventions change the world, and the reinvented world changes us. Human life on Earth today looks radically different from just a century ago, thanks in good part to technologies invented in the intervening years. Once firmly earthbound, with only legs and wheels to carry us on land and ships to cross the waters, we have now taken to flight in droves, with more than eight million passengers criss-crossing continents each day in a few airborne hours. If Rich-ard Branson, found of Virgin Galactic, achieves his dream of building the world's first commercial ordinary people may soon become astronauts. Communication, too, has broken free from shackles of time and distance. When I left India in the mid-1950s, it took three weeks for letters to go back and forth from Kolkata, where I was born, to Scarsdale, New York, where my family first settled. Mail would not arrive reliably. Stamps would be stolen and packages not delivered. Today, an electronic message sent at night from the eastern United States brings an instant reply from a friend in Europe or Asia whose day is just beginning. Facebook connects more than a billion users worldwide with a single mouse click or two. Last but not least, we have cracked the secrets of living";
+      msg.text = "Our inventions change the world, and the reinvented world changes us. Human life on Earth today looks radically different from just a century ago, thanks in good part to technologies invented in the intervening years. Once firmly earthbound, with only legs and wheels to carry us on land and ships to cross the waters, we have now taken to flight in droves, with more than eight million passengers criss-crossing continents each day in a few airborne hours. If Rich-ard Branson, found of Virgin Galactic, achieves his dream of building the world's first commercial ordinary people may soon become astronauts. Communication, too, has broken free from shackles of time and distance. When I left India in the mid-1950s, it took three weeks for letters to go back and forth from Kolkata, where I was born, to Scarsdale, New York, where my family first settled. Mail would not arrive reliably. Stamps would be stolen and packages not delivered. Today, an electronic message sent at night from the eastern United States brings an instant reply from a friend in Europe or Asia whose day is just beginning. Facebook connects more than a billion users worldwide with a single mouse click or two. Last but not least, we have cracked the secrets of living";
+      console.log('msg: ', msg)
+      window.speechSynthesis.speak(msg);
+  }
+
+
+async function loadIdentity(){
+    let identity_div = document.getElementById("identity_div");
+
+    try{
+        let identityInfo = await fetchJSON(`api/${apiVersion}/users/myIdentity`)
+        
+        if(identityInfo.status == "loggedin"){
+            myIdentity = identityInfo.userInfo.username;
+            identity_div.innerHTML = `
+            <a href="/userInfo.html?user=${encodeURIComponent(identityInfo.userInfo.username)}">${escapeHTML(identityInfo.userInfo.name)} (${escapeHTML(identityInfo.userInfo.username)})</a>
+            <a href="signout" class="btn btn-danger" role="button">Log out</a>`;
+            if(document.getElementById("make_post_div")){
+                document.getElementById("make_post_div").classList.remove("d-none");
+            }
+            Array.from(document.getElementsByClassName("new-comment-box")).forEach(e => e.classList.remove("d-none"))
+            Array.from(document.getElementsByClassName("heart-button-span")).forEach(e => e.classList.remove("d-none"));
+        } else { //logged out
+            myIdentity = undefined;
+            identity_div.innerHTML = `
+            <a href="signin" class="btn btn-primary" role="button">Log in</a>`;
+            if(document.getElementById("make_post_div")){
+                document.getElementById("make_post_div").classList.add("d-none");
+            }
+            Array.from(document.getElementsByClassName("new-comment-box")).forEach(e => e.classList.add("d-none"))
+            Array.from(document.getElementsByClassName("heart-button-span")).forEach(e => e.classList.add("d-none"));
+        }
+    } catch(error){
+        myIdentity = undefined;
+        identity_div.innerHTML = `<div>
+        <button onclick="loadIdentity()">retry</button>
+        Error loading identity: <span id="identity_error_span"></span>
+        </div>`;
+        document.getElementById("identity_error_span").innerText = error;
+        if(document.getElementById("make_post_div")){
+            document.getElementById("make_post_div").classList.add("d-none");
+        }
+        Array.from(document.getElementsByClassName("new-comment-box")).forEach(e => e.classList.add("d-none"));
+        Array.from(document.getElementsByClassName("heart-button-span")).forEach(e => e.classList.add("d-none"));
+    }
+}
+
+  function display() {
+    let msg = "Our inventions change the world, and the reinvented world changes us. Human life on Earth today looks radically different from just a century ago, thanks in good part to technologies invented in the intervening years. Once firmly earthbound, with only legs and wheels to carry us on land and ships to cross the waters, we have now taken to flight in droves, with more than eight million passengers criss-crossing continents each day in a few airborne hours. If Rich-ard Branson, found of Virgin Galactic, achieves his dream of building the world's first commercial ordinary people may soon become astronauts. Communication, too, has broken free from shackles of time and distance. When I left India in the mid-1950s, it took three weeks for letters to go back and forth from Kolkata, where I was born, to Scarsdale, New York, where my family first settled. Mail would not arrive reliably. Stamps would be stolen and packages not delivered. Today, an electronic message sent at night from the eastern United States brings an instant reply from a friend in Europe or Asia whose day is just beginning. Facebook connects more than a billion users worldwide with a single mouse click or two. Last but not least, we have cracked the secrets of living";    
+    let msgText
+    msgText.innerHTML = msg
+    document.getElementsByClassName('container')[0].appendChild(msgText);
+  }
+  async function fetchJSON(route, options){
+    let response
+    try{
+        response = await fetch(route, {
+            method: options && options.method ? options.method : "GET",
+            body: options && options.body ? JSON.stringify(options.body) : undefined,
+            headers: options && options.body ? {'Content-Type': 'application/json'}: undefined
+        })
+    }catch(error){
+        displayError()
+        throw new Error(
+            `Error fetching ${route} with options: ${options ? JSON.stringify(options) : options}
+             No response from server (failed to fetch)`)
+    }
+    let responseJson;
+    try{
+        responseJson = await response.json();
+    }catch(error){
+        try{
+            let responseText = await response.text();
+        }catch(getTextError){
+            displayError()
+            throw new Error(
+                `Error fetching ${route} with options: ${options ? JSON.stringify(options) : options}
+                Status: ${response.status}
+                Couldn't get response body
+                error: ${getTextError}`)
+        }
+        displayError()
+        throw new Error(
+            `Error fetching ${route} with options: ${options ? JSON.stringify(options) : options}
+            Status: ${response.status}
+            Response wasn't json: ${responseText ? JSON.stringify(responseText) : responseText}
+            error: ${getTextError}`)
+    }
+    if(response.status < 200 || response.status >= 300 || responseJson.status == "error"){
+        displayError()
+        throw new Error(
+            `Error fetching ${route} with options: ${options ? JSON.stringify(options) : options}
+            Status: ${response.status}
+            Response: ${responseJson ? JSON.stringify(responseJson) : responseJson}`)
+    }
+    return responseJson
+}
+
+async function displayError(){
+    document.getElementById('errorInfo').innerText = 'Error: action failed (see console for more information)'
+    document.getElementById('errorInfo').style.opacity = 1
+    // pause 4 seconds
+    await new Promise(resolve => setTimeout(resolve, 4 * 1000))
+    document.getElementById('errorInfo').innerText= ''
+    document.getElementById('errorInfo').style.opacity = 0
+}
+</script>
+
+<body onload="init()">
+  <nav class="navbar navbar-light bg-light">
+    <div id="errorInfo" class="alert alert-danger fade show" role="alert" style="opacity:0"></div>
+    <div id="identity_div">loading...</div>
+  </nav>
   <header>
-    <h1>Image to Text and Audio</h1>
+    <h1>Imaudio</h1>
   </header>
   <main>
-    <p></p>
-    <form method="POST" action="api/v1/scan"  enctype="multipart/form-data">
-      <div class="container">
-        <div class="button-wrap">
-          <label for="pdf">Upload PDF you wish to convert to audio:</label>
-          <input type="file" name="pdf" accept="application/pdf"/>
-        </div>
-        <input type="submit">
+    <div class="container input-group mb-3">
+      <div class="button-wrap">
+        <input type="file" class="form-control" id="pdf" accept="application/pdf" aria-describedby="pdfAddOn" aria-label="Upload">
+        <button class="btn btn-outline-secondary" type="button" id="pdfAddOn" onclick="display()">Submit</button>
       </div>
-    </form>
+
+      
+    </div>
 
 
     <div class="container-fluid center">
@@ -39,7 +164,8 @@
           <div class="card-container col d-flex col-md-5 col-12 m-2">
             <div>
               <div class="card-body btn btn-dark download-button">
-                <p class="card-text">Play Audio</p>
+                <!-- <p class="card-text" onClick="playAudio()">Play Audio</p> -->
+                <button type="submit" id="submit-audio" onclick="playAudio()">Play Audio</button>
               </div>
             </div>
           </div>
