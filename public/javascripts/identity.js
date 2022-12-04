@@ -9,7 +9,7 @@ async function loadIdentity(){
         if(identityInfo.status == "loggedin"){
             myIdentity = identityInfo.userInfo.username;
             identity_div.innerHTML = `
-            <a href="/userInfo.html?user=${encodeURIComponent(identityInfo.userInfo.username)}">${escapeHTML(identityInfo.userInfo.name)} (${escapeHTML(identityInfo.userInfo.username)})</a>
+            <a href="/userInfo.html?user=${encodeURIComponent(identityInfo.userInfo.username)}">${identityInfo.userInfo.name} (${identityInfo.userInfo.username})</a>
             <a href="signout" class="btn btn-danger" role="button">Log out</a>`;
             if(document.getElementById("make_post_div")){
                 document.getElementById("make_post_div").classList.remove("d-none");
