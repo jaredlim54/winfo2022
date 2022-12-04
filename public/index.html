@@ -7,10 +7,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300&family=Raleway:ital,wght@1,200&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
   <link rel="stylesheet" href="/stylesheets/style.css">
-  <script src="/javascripts/index.js"></script>
+  <!-- <script src="/javascripts/index.js"></script>
   <script src="/javascripts/identity.js"></script>
   <script src="/javascripts/utils.js"></script>
-  <script src="/javascripts/api_version.js"></script>
+  <script src="/javascripts/api_version.js"></script> -->
   <title>Express</title>
 </head>
 
@@ -20,21 +20,26 @@
 
   let textExample = "Our inventions change the world, and the reinvented world changes us. Human life on Earth today looks radically different from just a century ago, thanks in good part to technologies invented in the intervening years. Once firmly earthbound, with only legs and wheels to carry us on land and ships to cross the waters, we have now taken to flight in droves, with more than eight million passengers criss-crossing continents each day in a few airborne hours. If Rich-ard Branson, found of Virgin Galactic, achieves his dream of building the world's first commercial ordinary people may soon become astronauts. Communication, too, has broken free from shackles of time and distance. When I left India in the mid-1950s, it took three weeks for letters to go back and forth from Kolkata, where I was born, to Scarsdale, New York, where my family first settled. Mail would not arrive reliably. Stamps would be stolen and packages not delivered. Today, an electronic message sent at night from the eastern United States brings an instant reply from a friend in Europe or Asia whose day is just beginning. Facebook connects more than a billion users worldwide with a single mouse click or two. Last but not least, we have cracked the secrets of living";
 
-  function playAudio() {
+
+  async function playAudio() {
+      let scannedText = await fetchJSON(`api/v1/scan`)
       // The text to synthesize
       var msg = new SpeechSynthesisUtterance();
       //msg.text = "Our inventions change the world, and the reinvented world changes us. Human life on Earth today looks radically different from just a century ago, thanks in good part to technologies invented in the intervening years. Once firmly earthbound, with only legs and wheels to carry us on land and ships to cross the waters, we have now taken to flight in droves, with more than eight million passengers criss-crossing continents each day in a few airborne hours. If Rich-ard Branson, found of Virgin Galactic, achieves his dream of building the world's first commercial ordinary people may soon become astronauts. Communication, too, has broken free from shackles of time and distance. When I left India in the mid-1950s, it took three weeks for letters to go back and forth from Kolkata, where I was born, to Scarsdale, New York, where my family first settled. Mail would not arrive reliably. Stamps would be stolen and packages not delivered. Today, an electronic message sent at night from the eastern United States brings an instant reply from a friend in Europe or Asia whose day is just beginning. Facebook connects more than a billion users worldwide with a single mouse click or two. Last but not least, we have cracked the secrets of living";
-      msg.text = "Our inventions change the world, and the reinvented world changes us. Human life on Earth today looks radically different from just a century ago, thanks in good part to technologies invented in the intervening years. Once firmly earthbound, with only legs and wheels to carry us on land and ships to cross the waters, we have now taken to flight in droves, with more than eight million passengers criss-crossing continents each day in a few airborne hours. If Rich-ard Branson, found of Virgin Galactic, achieves his dream of building the world's first commercial ordinary people may soon become astronauts. Communication, too, has broken free from shackles of time and distance. When I left India in the mid-1950s, it took three weeks for letters to go back and forth from Kolkata, where I was born, to Scarsdale, New York, where my family first settled. Mail would not arrive reliably. Stamps would be stolen and packages not delivered. Today, an electronic message sent at night from the eastern United States brings an instant reply from a friend in Europe or Asia whose day is just beginning. Facebook connects more than a billion users worldwide with a single mouse click or two. Last but not least, we have cracked the secrets of living";
-      console.log('msg: ', msg)
-      window.speechSynthesis.speak(msg);
+      //msg.text = "Our inventions change the world, and the reinvented world changes us. Human life on Earth today looks radically different from just a century ago, thanks in good part to technologies invented in the intervening years. Once firmly earthbound, with only legs and wheels to carry us on land and ships to cross the waters, we have now taken to flight in droves, with more than eight million passengers criss-crossing continents each day in a few airborne hours. If Rich-ard Branson, found of Virgin Galactic, achieves his dream of building the world's first commercial ordinary people may soon become astronauts. Communication, too, has broken free from shackles of time and distance. When I left India in the mid-1950s, it took three weeks for letters to go back and forth from Kolkata, where I was born, to Scarsdale, New York, where my family first settled. Mail would not arrive reliably. Stamps would be stolen and packages not delivered. Today, an electronic message sent at night from the eastern United States brings an instant reply from a friend in Europe or Asia whose day is just beginning. Facebook connects more than a billion users worldwide with a single mouse click or two. Last but not least, we have cracked the secrets of living";
+      msg.text = scannedText
+      console.log('msg: ', text)
+      window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
   }
-
+async function init() {
+  await loadIdentity();
+}
 
 async function loadIdentity(){
     let identity_div = document.getElementById("identity_div");
 
     try{
-        let identityInfo = await fetchJSON(`api/${apiVersion}/users/myIdentity`)
+        let identityInfo = await fetchJSON(`api/v1/users/myIdentity`)
         
         if(identityInfo.status == "loggedin"){
             myIdentity = identityInfo.userInfo.username;
@@ -71,11 +76,13 @@ async function loadIdentity(){
     }
 }
 
-  function display() {
-    let msg = "Our inventions change the world, and the reinvented world changes us. Human life on Earth today looks radically different from just a century ago, thanks in good part to technologies invented in the intervening years. Once firmly earthbound, with only legs and wheels to carry us on land and ships to cross the waters, we have now taken to flight in droves, with more than eight million passengers criss-crossing continents each day in a few airborne hours. If Rich-ard Branson, found of Virgin Galactic, achieves his dream of building the world's first commercial ordinary people may soon become astronauts. Communication, too, has broken free from shackles of time and distance. When I left India in the mid-1950s, it took three weeks for letters to go back and forth from Kolkata, where I was born, to Scarsdale, New York, where my family first settled. Mail would not arrive reliably. Stamps would be stolen and packages not delivered. Today, an electronic message sent at night from the eastern United States brings an instant reply from a friend in Europe or Asia whose day is just beginning. Facebook connects more than a billion users worldwide with a single mouse click or two. Last but not least, we have cracked the secrets of living";    
-    let msgText
-    msgText.innerHTML = msg
-    document.getElementsByClassName('container')[0].appendChild(msgText);
+  async function display() {
+    //let msg = "Our inventions change the world, and the reinvented world changes us. Human life on Earth today looks radically different from just a century ago, thanks in good part to technologies invented in the intervening years. Once firmly earthbound, with only legs and wheels to carry us on land and ships to cross the waters, we have now taken to flight in droves, with more than eight million passengers criss-crossing continents each day in a few airborne hours. If Rich-ard Branson, found of Virgin Galactic, achieves his dream of building the world's first commercial ordinary people may soon become astronauts. Communication, too, has broken free from shackles of time and distance. When I left India in the mid-1950s, it took three weeks for letters to go back and forth from Kolkata, where I was born, to Scarsdale, New York, where my family first settled. Mail would not arrive reliably. Stamps would be stolen and packages not delivered. Today, an electronic message sent at night from the eastern United States brings an instant reply from a friend in Europe or Asia whose day is just beginning. Facebook connects more than a billion users worldwide with a single mouse click or two. Last but not least, we have cracked the secrets of living";    
+    let text = await fetchJSON(`api/v1/scan`)
+    console.log(text[0])
+    let msgText = `<p>${text[0]}</p>`
+    //msgText.innerHTML = msg
+    document.getElementsByClassName('return-text')[0].innerText = text;
   }
   async function fetchJSON(route, options){
     let response
@@ -132,7 +139,7 @@ async function displayError(){
 }
 </script>
 
-<body onload="init()">
+<body onload="loadIdentity()">
   <nav class="navbar navbar-light bg-light">
     <div id="errorInfo" class="alert alert-danger fade show" role="alert" style="opacity:0"></div>
     <div id="identity_div">loading...</div>
@@ -143,9 +150,13 @@ async function displayError(){
   <main>
     <div class="container input-group mb-3">
       <div class="button-wrap">
-        <input type="file" class="form-control" id="pdf" accept="application/pdf" aria-describedby="pdfAddOn" aria-label="Upload">
-        <button class="btn btn-outline-secondary" type="button" id="pdfAddOn" onclick="display()">Submit</button>
+        <form id="room_form" action="/api/v1/scan" method="POST" enctype="multipart/form-data" target="hiddenFrame">
+          <input type="file" name="pdf" class="form-control" id="pdf" accept="application/pdf" aria-describedby="pdfAddOn" aria-label="Upload">
+          <button class="btn btn-outline-secondary" type="submit" id="pdfAddOn">Submit</button>
+        </form>
+        <iframe name="hiddenFrame" width="0" height="0" border="0" style="display: none;"></iframe>
       </div>
+      <p class="return-text"></p>
 
       
     </div>
@@ -157,15 +168,15 @@ async function displayError(){
           <div class="card-container col d-flex col-md-5 col-12 m-2">
             <div>
               <div class="card-body btn btn-dark download-button">
-                <p class="card-text">Download Text File</p>
+                <p class="card-text" onclick="display()">Get return Text</p>
               </div>
             </div>
           </div>
           <div class="card-container col d-flex col-md-5 col-12 m-2">
             <div>
-              <div class="card-body btn btn-dark download-button">
+              <div class="card-body">
                 <!-- <p class="card-text" onClick="playAudio()">Play Audio</p> -->
-                <button type="submit" id="submit-audio" onclick="playAudio()">Play Audio</button>
+                <button class="card-text btn btn-dark download-button" type="submit" id="submit-audio" onclick="playAudio()">Play Audio</button>
               </div>
             </div>
           </div>
